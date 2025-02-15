@@ -1,0 +1,153 @@
+<app-blank pageTitle="Kargo Oluştur">
+    <div class="card">
+        <div class="card-body">
+            <form #form="ngForm" autocomplete="off" formValidate (ngSubmit)="save(form)">
+                <flexi-stepper [completeBtnText]="'Kaydet'" [loading]="loading()">
+                    <!-- Gönderen -->
+                    <flexi-step flexiStepTitle="Gönderen Bilgileri">
+                        <div class="row form-group">
+                            <div class="col-md-4 col-12">
+                                <div class="form-group mt-2">
+                                    <label>T.C. <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" [(ngModel)]="data().gonderen.tcNumarasi" name="gonderenTCNumarasi" required minlength="11" maxlength="11">
+                                    <div class="invalid-feedback">Geçerli bir TC numarası girin</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-12">
+                                <div class="form-group mt-2">
+                                    <label>Adı <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" [(ngModel)]="data().gonderen.firstName" name="gonderenFirstName" required minlength="3">
+                                    <div class="invalid-feedback">Geçerli bir ad girin</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-12">
+                                <div class="form-group mt-2">
+                                    <label>Soyadı <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" [(ngModel)]="data().gonderen.lastName" name="gonderenLastName" required minlength="3">
+                                    <div class="invalid-feedback">Geçerli bir soyadı girin</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-12">
+                                <div class="form-group mt-2">
+                                    <label>Email</label>
+                                    <input type="text" class="form-control" [(ngModel)]="data().gonderen.email" name="gonderenEmail">                                    
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-12">
+                                <div class="form-group mt-2">
+                                    <label>Telefon Numarası <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" [(ngModel)]="data().gonderen.phoneNumber" name="gonderenPhoneNumber" required prefix="0" mask="(999) 999 9999">
+                                    <div class="invalid-feedback">Geçerli bir telfon numarası girin</div>                                  
+                                </div>
+                            </div>
+                        </div>
+                    </flexi-step>     
+            
+                    <!-- Alıcı -->
+                    <flexi-step flexiStepTitle="Alıcı Bilgileri">
+                        <div class="row form-group">
+                            <div class="col-md-4 col-12">
+                                <div class="form-group mt-2">
+                                    <label>T.C. <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" [(ngModel)]="data().alici.tcNumarasi" name="aliciTCNumarasi" required minlength="11" maxlength="11">
+                                    <div class="invalid-feedback">Geçerli bir TC numarası girin</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-12">
+                                <div class="form-group mt-2">
+                                    <label>Adı <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" [(ngModel)]="data().alici.firstName" name="aliciFirstName" required minlength="3">
+                                    <div class="invalid-feedback">Geçerli bir ad girin</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-12">
+                                <div class="form-group mt-2">
+                                    <label>Soyadı <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" [(ngModel)]="data().alici.lastName" name="aliciLastName" required minlength="3">
+                                    <div class="invalid-feedback">Geçerli bir soyadı girin</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-12">
+                                <div class="form-group mt-2">
+                                    <label>Email</label>
+                                    <input type="text" class="form-control" [(ngModel)]="data().alici.email" name="aliciEmail">                                    
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-12">
+                                <div class="form-group mt-2">
+                                    <label>Telefon Numarası <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" [(ngModel)]="data().alici.phoneNumber" name="aliciPhoneNumber" required prefix="0" mask="(999) 999 9999">
+                                    <div class="invalid-feedback">Geçerli bir telfon numarası girin</div>                                  
+                                </div>
+                            </div>
+                        </div>                 
+                    </flexi-step>   
+                    
+                    <!-- Teslim Adresi -->
+                    <flexi-step flexiStepTitle="Teslim Adresi">
+                        <div class="row form-group">
+                            <div class="col-md-3 col-12">
+                                <div class="form-group mt-2">
+                                    <label>Şehir <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" [(ngModel)]="data().teslimAdresi.city" name="teslimAdresiCity" required minlength="3">
+                                    <div class="invalid-feedback">Geçerli bir şehir girin</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-12">
+                                <div class="form-group mt-2">
+                                    <label>İlçe <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" [(ngModel)]="data().teslimAdresi.town" name="teslimAdresiTown" required minlength="3">
+                                    <div class="invalid-feedback">Geçerli bir ilçe girin</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-12">
+                                <div class="form-group mt-2">
+                                    <label>Mahalle <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" [(ngModel)]="data().teslimAdresi.mahalle" name="teslimAdresiMahalle" required minlength="3">
+                                    <div class="invalid-feedback">Geçerli bir mahalle girin</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-12">
+                                <div class="form-group mt-2">
+                                    <label>Sokak</label>
+                                    <input type="text" class="form-control" [(ngModel)]="data().teslimAdresi.street" name="teslimAdresiStreet">                                    
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-12">
+                                <div class="form-group mt-2">
+                                    <label>Tam Adres <span class="text-danger">*</span></label>
+                                    <textarea type="text" class="form-control" [(ngModel)]="data().teslimAdresi.fullAddress" name="teslimAdresiFullAddress" required minlength="10" rows="10">                                        
+                                    </textarea>
+                                    <div class="invalid-feedback">Geçerli bir tam adres girin</div>                                  
+                                </div>
+                            </div>
+                        </div>                 
+                    </flexi-step>  
+
+                    <!-- Kargo Bilgileri  -->
+                    <flexi-step flexiStepTitle="Kargo Bilgileri">
+                        <div class="row form-group">
+                            <div class="col-md-3 col-12">
+                                <div class="form-group mt-2">
+                                    <label>Kargo Tipi <span class="text-danger">*</span></label>
+                                    <select class="form-control" name="kargoInformationKargoTipi" [(ngModel)]="data().kargoInformation.kargoTipiValue">
+                                        <option [value]="0">Paket</option>
+                                        <option [value]="1">Zarf</option>
+                                        <option [value]="2">Koli</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-12">
+                                <div class="form-group mt-2">
+                                    <label>Ağırlık (KG) <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" [(ngModel)]="data().kargoInformation.agirlik" name="kargoInformationAgirlik" required min="1">
+                                    <div class="invalid-feedback">Geçerli bir ilçe girin</div>
+                                </div>
+                            </div>
+                        </div>
+                    </flexi-step> 
+                </flexi-stepper>
+            </form>
+        </div>
+    </div>
+</app-blank>

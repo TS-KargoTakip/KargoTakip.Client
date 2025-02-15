@@ -1,40 +1,87 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, computed, inject, resource, signal, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, linkedSignal, resource, signal, ViewEncapsulation } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { lastValueFrom } from 'rxjs';
 import { ODataModel } from '../../models/odata.model';
-import { FlexiGridModule, FlexiGridService, StateModel } from 'flexi-grid';
+import { FlexiGridFilterDataModel, FlexiGridModule, FlexiGridService, StateModel } from 'flexi-grid';
+import { BreadcrumbService } from '../../services/breadcrumb.service';
+import { BreadCrumbModel } from '../../models/breadcrumb.model';
+import BlankComponent from '../../components/blank/blank.component';
+import { api } from '../../constants';
+import { KargoModel } from '../../models/kargo.model';
+import { FlexiToastService } from 'flexi-toast';
+import { ResultModel } from '../../models/result.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
-  imports: [RouterLink, FlexiGridModule],
+  imports: [RouterLink, FlexiGridModule, BlankComponent, CommonModule],
   templateUrl: './kargolar.component.html',
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export default class KargolarComponent {
-  token = signal<string>("eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjI1MGIwNjY0LTE3YzEtNGEyMS05NzZlLTc5NTUxNWM3ZDViMSIsIm5iZiI6MTczOTA0MzQ4MiwiZXhwIjoxNzM5MTI5ODgyLCJpc3MiOiJUYW5lciBTYXlkYW0iLCJhdWQiOiJUYW5lciBTYXlkYW0ifQ.qcRhf_69mRIqOzs6FOTN5uefvxSmlZ6oJtFdRmj-QMJZiv1tTu2u-_Bw3AHyGNgl_tWzOycdT9z_RuNPX90LLA");
+export default class KargolarComponent {  
   result = resource({
     request: () => this.state(),
     loader:async ()=> {
-      let endpoint = "https://localhost:7213/odata/kargolar?$count=true";
+      let endpoint = `${api}/odata/kargolar?$count=true`;
       const odataEndpoint = this.#grid.getODataEndpoint(this.state());
       endpoint += "&" + odataEndpoint;
-      var res = await lastValueFrom(this.#http.get<ODataModel<any[]>>(endpoint,{
-        headers: {"Authorization":"bearer " + this.token()}
-      }));
+      var res = await lastValueFrom(this.#http.get<ODataModel<any[]>>(endpoint));
 
       return res;
     }
   });
-  data = computed(() => this.result.value()?.value);
-  total = computed(() => this.result.value()?.['@odata.count']);
-  loading = computed(() => this.result.isLoading());
-  state = signal<StateModel>(new StateModel());
+  readonly data = computed(() => this.result.value()?.value ?? []);
+  readonly total = computed(() => this.result.value()?.['@odata.count'] ?? 0);
+  readonly loading = linkedSignal(() => this.result.isLoading());
+  readonly state = signal<StateModel>(new StateModel());
+  readonly durumFilterData = signal<FlexiGridFilterDataModel[]>([
+    {
+      name: "Bekliyor",
+      value: 0
+    },
+    {
+      name: "Araca Teslim Edildi",
+      value: 1
+    }
+  ])
 
   #http = inject(HttpClient);
   #grid = inject(FlexiGridService);
+  #breadcrumb = inject(BreadcrumbService);  
+  #toast = inject(FlexiToastService);
+
+  constructor(){
+    this.#breadcrumb.reset();
+    this.#breadcrumb.add("Kargolar", "/kargolar",  "package_2")
+  }
 
   dataStateChange(event: StateModel){
     this.state.set(event);    
+  }
+
+  async exportExcel(){
+    let endpoint = `${api}/odata/kargolar?$count=true`;
+    var res = await lastValueFrom(this.#http.get<ODataModel<any[]>>(endpoint));
+    this.#grid.exportDataToExcel(res.value, "Kargo Listesi");
+  }
+
+  delete(item: KargoModel){
+    const endpoint = `${api}/kargolar/${item.id}`;
+    this.#toast.showSwal("Kargoyu Sil?",`Aşağıdaki bilgilere ait kargoyu silmek istiyor musunuz?<br/><b>Gönderen:</b> ${item.gonderenFullName}<br/><b>Alıcı:</b> ${item.aliciFullName}`,()=> {
+      this.loading.set(true);
+      this.#http.delete<ResultModel<string>>(endpoint).subscribe(res => {
+        this.#toast.showToast("Bilgilendirme",res.data!,"info");
+        this.result.reload();
+      });
+    })
+  }
+
+  getDurumClass(durum: string){
+    if(durum === "Bekliyor"){
+      return "alert-warning"
+    }
+
+    return "";
   }
 }

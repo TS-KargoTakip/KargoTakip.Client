@@ -13,7 +13,11 @@
     "@angular/platform-browser": "~19.1.0",
     "@angular/platform-browser-dynamic": "~19.1.0",
     "@angular/router": "~19.1.0",
-    "flexi-grid": "^19.0.40",
+    "flexi-grid": "^19.0.41",
+    "flexi-stepper": "^19.0.6",
+    "flexi-toast": "^19.0.3",
+    "form-validate-angular": "^19.0.1",
+    "ngx-mask": "^19.0.6",
     "rxjs": "~7.8.0",
     "zone.js": "~0.15.0"
   },

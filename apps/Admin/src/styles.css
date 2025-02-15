@@ -1,1 +1,23 @@
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200");
+@import url("/node_modules/flexi-toast/src/flexi-toast.css");
+
+.material-symbols-outlined {
+    font-family: Material Symbols Outlined;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 20px;
+    display: inline-flex;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    -webkit-font-feature-settings: "liga";
+    font-feature-settings: "liga";
+    -webkit-font-smoothing: antialiased;
+}
+
+.flexi-swal-content h1{
+    font-size: 25px;
+}
