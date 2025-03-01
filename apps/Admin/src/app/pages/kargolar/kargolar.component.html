@@ -1,35 +1,46 @@
 <app-blank pageTitle="Kargolar">
-    <flexi-grid 
-      [data]="data()!" 
-      [dataBinding]="true" 
+    <flexi-grid
+      [data]="data()!"
+      [dataBinding]="true"
       [total]="total()!"
       [loading]="loading()"
       [showCaption]="true"
       captionTitle="Kargo Listesi"
       [showCommandColumn]="true"
-      [commandColumnTemplate]="commandColumnTemplate"    
+      [commandColumnTemplate]="commandColumnTemplate"
       (dataStateChange)="dataStateChange($event)"
       [captionTemplate]="captionTemplate"
       [showExportExcelBtn]="true"
       [exportExcelButtonClick]="exportExcel.bind(this)"
       fontSize="17px"
+      language="tr"
+      [useCommandDropdown]="false"
+      commandColumnWidth="150px"
       >
       <ng-template #captionTemplate>
-          <flexi-button routerLink="/kargolar/ekle" btnSize="small" btnColor="primary" title="Kargo Ekle" flexiTooltip btnIcon="add" />
+          <flexi-button routerLink="/kargolar/create" btnSize="small" btnColor="primary" title="Kargo Ekle" flexiTooltip btnIcon="add" />
       </ng-template>
-    
-      <flexi-grid-column field="createAt" title="Kayıt Tarihi" filterType="date" format="dd MMM yyyy HH:mm:ss" width="200px"/>
+
+      <flexi-grid-column field="createAt" title="Kayıt Tarihi" filterType="date" format="dd MMM yyyy HH:mm:ss" width="200px">
+        <ng-template flexiGridFooterTemplate let-data>
+            <span>Toplam</span>
+        </ng-template>
+      </flexi-grid-column>
       <flexi-grid-column field="gonderenFullName" title="Gön.Adı" />
       <flexi-grid-column field="aliciFullName" title="Al.Adı" />
       <flexi-grid-column field="teslimAdresiCity" title="Teslim Şehir" />
       <flexi-grid-column field="teslimAdresiTown" title="Teslim İlçe" />
       <flexi-grid-column field="kargoTipiName" title="Kargo Tipi" />
-      <flexi-grid-column field="agirlik" title="Ağırlık (kg)" />
-      <flexi-grid-column field="kargoDurumValue" title="Durum" textAlign="center" filterType="select" [filterData]="durumFilterData()">
+      <flexi-grid-column field="agirlik" title="Ağırlık (kg)" textAlign="right">
+        <ng-template flexiGridFooterTemplate>
+            <span>{{getAgirlikTotal()}}</span>
+        </ng-template>
+      </flexi-grid-column>
+      <flexi-grid-column field="kargoDurumValue" title="Durum" textAlign="center" filterType="select" [filterData]="durumFilterData()" width="200px">
         <ng-template flexiGridCellTemplate let-item>
-            <span 
-            class="alert" 
-            [ngClass]="getDurumClass(item.kargoDurumName)" 
+            <span
+            class="alert"
+            [ngClass]="getDurumClass(item.kargoDurumName)"
             style="padding: 5px; border-width: 1px; border-color: #ccc;">
                 {{item.kargoDurumName}}
             </span>
@@ -38,9 +49,38 @@
       <flexi-grid-column field="createUserName" title="Kayd.Kul." />
       <flexi-grid-column field="updateAt" title="Gün.Tar." filterType="date" format="dd MMM yyyy HH:mm:ss" />
       <flexi-grid-column field="updateUserName" title="Gün.Kul." />
-    
+
       <ng-template #commandColumnTemplate let-item>
-          <flexi-button btnSize="x-small" btnIcon="delete" btnColor="danger" title="Sil" flexiTooltip (click)="delete(item)"/>
+        <flexi-button btnSize="x-small" btnIcon="rotate_90_degrees_cw" btnColor="info" title="Durum Değiştir" flexiTooltip (click)="openUpdateDurumPopup(item)" />
+        @if(item.kargoDurumValue === "0"){
+          <flexi-button
+            btnSize="x-small"
+            btnIcon="edit"
+            btnColor="primary"
+            title="Güncelle"
+            flexiTooltip
+            routerLink="/kargolar/edit/{{item.id}}" />
+            <flexi-button btnSize="x-small" btnIcon="delete" btnColor="danger" title="Sil" flexiTooltip (click)="delete(item)"/>
+        }
       </ng-template>
     </flexi-grid>
 </app-blank>
+
+
+<flexi-popup
+    popupTitle="Kargo Durum Güncelle"
+    [(isPopupVisible)]="isPopupVisible"
+    height="100px"
+    [loading]="popupLoading()"
+    (onSave)="updateDurum()"
+    saveBtnText="Durumu Güncelle"
+    saveBtnIcon="edit">
+  <div class="form-group">
+    <label>Durum</label>
+    <select class="form-control" [(ngModel)]="durumUpdateRequest().durumValue">
+      @for(durum of durumFilterData(); track durum.value){
+        <option [value]="durum.value">{{durum.name}}</option>
+      }
+    </select>
+  </div>
+</flexi-popup>

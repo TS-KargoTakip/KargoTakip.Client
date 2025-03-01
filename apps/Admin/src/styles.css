@@ -21,3 +21,7 @@
 .flexi-swal-content h1{
     font-size: 25px;
 }
+
+a{
+    text-decoration: none !important;
+}

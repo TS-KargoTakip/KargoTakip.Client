@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal, ViewEncapsulation } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { BreadcrumbService } from '../services/breadcrumb.service';
 import { DatePipe } from '@angular/common';
 
@@ -15,10 +15,16 @@ export default class LayoutComponent {
 
   #breadcrumb = inject(BreadcrumbService);
   #date = inject(DatePipe);
+  #router = inject(Router);
 
   constructor(){
     setInterval(() => {
       this.time.set(this.#date.transform(new Date(), "dd.MM.yyyy HH:mm:ss")!);
     },1000)
+  }
+
+  logout(){
+    localStorage.clear();
+    this.#router.navigateByUrl("/login");
   }
 }

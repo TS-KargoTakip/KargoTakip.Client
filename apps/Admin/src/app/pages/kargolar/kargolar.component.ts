@@ -5,21 +5,31 @@ import { lastValueFrom } from 'rxjs';
 import { ODataModel } from '../../models/odata.model';
 import { FlexiGridFilterDataModel, FlexiGridModule, FlexiGridService, StateModel } from 'flexi-grid';
 import { BreadcrumbService } from '../../services/breadcrumb.service';
-import { BreadCrumbModel } from '../../models/breadcrumb.model';
 import BlankComponent from '../../components/blank/blank.component';
 import { api } from '../../constants';
 import { KargoModel } from '../../models/kargo.model';
 import { FlexiToastService } from 'flexi-toast';
 import { ResultModel } from '../../models/result.model';
 import { CommonModule } from '@angular/common';
+import { FlexiButtonComponent } from 'flexi-button';
+import { FlexiPopupModule } from 'flexi-popup';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  imports: [RouterLink, FlexiGridModule, BlankComponent, CommonModule],
+  imports: [
+    RouterLink,
+    FlexiGridModule,
+    BlankComponent,
+    CommonModule,
+    FlexiButtonComponent,
+    FlexiPopupModule,
+    FormsModule
+  ],
   templateUrl: './kargolar.component.html',
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export default class KargolarComponent {  
+export default class KargolarComponent {
   result = resource({
     request: () => this.state(),
     loader:async ()=> {
@@ -34,6 +44,8 @@ export default class KargolarComponent {
   readonly data = computed(() => this.result.value()?.value ?? []);
   readonly total = computed(() => this.result.value()?.['@odata.count'] ?? 0);
   readonly loading = linkedSignal(() => this.result.isLoading());
+  isPopupVisible = false;
+  readonly popupLoading = signal<boolean>(false);
   readonly state = signal<StateModel>(new StateModel());
   readonly durumFilterData = signal<FlexiGridFilterDataModel[]>([
     {
@@ -44,20 +56,21 @@ export default class KargolarComponent {
       name: "Araca Teslim Edildi",
       value: 1
     }
-  ])
+  ]);
+  readonly durumUpdateRequest = signal<{id: string, durumValue: number}>({id: "", durumValue: 0});
 
   #http = inject(HttpClient);
   #grid = inject(FlexiGridService);
-  #breadcrumb = inject(BreadcrumbService);  
+  #breadcrumb = inject(BreadcrumbService);
   #toast = inject(FlexiToastService);
 
   constructor(){
     this.#breadcrumb.reset();
-    this.#breadcrumb.add("Kargolar", "/kargolar",  "package_2")
+    this.#breadcrumb.add("Kargolar", "/kargolar",  "package_2");
   }
 
   dataStateChange(event: StateModel){
-    this.state.set(event);    
+    this.state.set(event);
   }
 
   async exportExcel(){
@@ -83,5 +96,28 @@ export default class KargolarComponent {
     }
 
     return "";
+  }
+
+  getAgirlikTotal(){
+    const agirliklar = this.data().map(p => p.agirlik);
+    let total = 0;
+    agirliklar.forEach(e => total += e);
+    return total;
+  }
+
+  openUpdateDurumPopup(item: KargoModel){
+    this.durumUpdateRequest().id = item.id;
+    this.durumUpdateRequest().durumValue = item.kargoDurumValue;
+    this.isPopupVisible = true;
+  }
+
+  updateDurum(){
+    this.popupLoading.set(true);
+    this.#http.put<ResultModel<string>>(`${api}/kargolar/update-status`, this.durumUpdateRequest()).subscribe(res => {
+      this.popupLoading.set(false);
+      this.isPopupVisible = false;
+      this.result.reload();
+      this.#toast.showToast("Başarılı",res.data!,"info");
+    });
   }
 }

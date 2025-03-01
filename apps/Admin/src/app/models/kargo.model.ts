@@ -6,6 +6,7 @@ export class KargoModel {
     alici: KargoKisiModel = new KargoKisiModel();
     teslimAdresi: KargoAdresModel = new KargoAdresModel();
     kargoInformation: KargoBilgiModel = new KargoBilgiModel();
+    kargoDurumValue: number = 0;
 }
 
 export class KargoKisiModel {
