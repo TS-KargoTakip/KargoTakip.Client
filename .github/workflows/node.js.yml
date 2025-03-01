@@ -25,11 +25,11 @@ jobs:
     - run: npm install
     - run: npx nx build Admin
     
-    - name: FTP Uploader  
-    - uses: zinh/ftp-uploader-action@v0.5
-      with:        
-        ftpHostname: ftp         
-        ftpUsername: username
-        ftpPassword: passowrd
-        files: dist\apps\Admin       
+    ## - name: FTP Uploader  
+    ##- uses: zinh/ftp-uploader-action@v0.5
+    ##  with:        
+    ##    ftpHostname: ftp         
+    ##    ftpUsername: username
+    ##    ftpPassword: passowrd
+    ##    files: dist\apps\Admin       
           
